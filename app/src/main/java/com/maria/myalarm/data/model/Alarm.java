@@ -9,7 +9,7 @@ public class Alarm {
     private int id;
 
     private String time; // формат: "07:30"
-    private String label; // например "Ставане"
+    private String label;
     private boolean isEnabled;
 
     public Alarm(String time, String label, boolean isEnabled) {
