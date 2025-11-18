@@ -33,7 +33,9 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
     @Override
     public void onBindViewHolder(@NonNull AlarmViewHolder holder, int position) {
         Alarm alarm = alarmList.get(position);
+
         holder.timeText.setText(alarm.getTime());
+        holder.labelText.setText(alarm.getLabel());
         holder.alarmSwitch.setChecked(alarm.isEnabled());
     }
 
@@ -44,12 +46,14 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
 
     public static class AlarmViewHolder extends RecyclerView.ViewHolder {
         TextView timeText;
+        TextView labelText;
         Switch alarmSwitch;
 
         public AlarmViewHolder(@NonNull View itemView) {
             super(itemView);
 
             timeText = itemView.findViewById(R.id.alarmTimeText);
+            labelText = itemView.findViewById(R.id.alarmLabel);
             alarmSwitch = itemView.findViewById(R.id.alarmSwitch);
         }
     }
