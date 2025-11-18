@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private AlarmAdapter adapter;
     private List<Alarm> alarmList = new ArrayList<>();
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         alarmList = repository.getAllAlarms();
 
         //Зареждаме adapter
-        adapter = new AlarmAdapter(alarmList);
+        adapter = new AlarmAdapter(alarmList,repository);
         alarmRecyclerView.setAdapter(adapter);
 
         // 5) Listener за "Добави аларма"

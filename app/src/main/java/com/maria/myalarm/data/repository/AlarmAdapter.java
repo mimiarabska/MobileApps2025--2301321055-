@@ -11,15 +11,18 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.maria.myalarm.R;
 import com.maria.myalarm.data.model.Alarm;
+import com.maria.myalarm.data.repository.AlarmRepository;
 
 import java.util.List;
 
 public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHolder> {
 
     private final List<Alarm> alarmList;
+    private final AlarmRepository repository;
 
-    public AlarmAdapter(List<Alarm> alarmList) {
+    public AlarmAdapter(List<Alarm> alarmList, AlarmRepository repository) {
         this.alarmList = alarmList;
+        this.repository = repository;
     }
 
     @NonNull
@@ -34,9 +37,19 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
     public void onBindViewHolder(@NonNull AlarmViewHolder holder, int position) {
         Alarm alarm = alarmList.get(position);
 
+        // Показваме час и label
         holder.timeText.setText(alarm.getTime());
         holder.labelText.setText(alarm.getLabel());
+
+        // За да не тригерираме listener при повторно bind
+        holder.alarmSwitch.setOnCheckedChangeListener(null);
         holder.alarmSwitch.setChecked(alarm.isEnabled());
+
+        // Listener за включване/изключване
+        holder.alarmSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            alarm.setEnabled(isChecked);   // обновяваме обекта
+            repository.update(alarm);      // записваме в базата
+        });
     }
 
     @Override
@@ -51,7 +64,6 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
 
         public AlarmViewHolder(@NonNull View itemView) {
             super(itemView);
-
             timeText = itemView.findViewById(R.id.alarmTimeText);
             labelText = itemView.findViewById(R.id.alarmLabel);
             alarmSwitch = itemView.findViewById(R.id.alarmSwitch);
