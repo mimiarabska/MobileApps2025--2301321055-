@@ -45,8 +45,14 @@ public class MainActivity extends AppCompatActivity {
         adapter = new AlarmAdapter(alarmList,repository);
         alarmRecyclerView.setAdapter(adapter);
 
-        // 5) Listener за "Добави аларма"
+        // Listener за "Добави аларма"
         addAlarmButton.setOnClickListener(v -> openTimePicker());
+
+        adapter.setOnAlarmLongClickListener((alarm, position) -> {
+            showDeleteDialog(alarm, position);
+        });
+
+
     }
 
     //Избиране на час-
@@ -95,4 +101,19 @@ public class MainActivity extends AppCompatActivity {
 
         adapter.notifyDataSetChanged();  // обновяване на екрана
     }
+
+    //Изтриване на аларма
+    private void showDeleteDialog(Alarm alarm, int position) {
+        new AlertDialog.Builder(this)
+                .setTitle("Delete alarm?")
+                .setMessage("Are you sure you want to delete this alarm?")
+                .setPositiveButton("Delete", (dialog, which) -> {
+                    repository.delete(alarm);   // изтриваме от базата
+                    alarmList.remove(position); // премахваме от списъка
+                    adapter.notifyItemRemoved(position); // обновяваме RecyclerView
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
 }

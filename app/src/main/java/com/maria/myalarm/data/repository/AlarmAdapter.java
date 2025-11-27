@@ -20,6 +20,18 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
     private final List<Alarm> alarmList;
     private final AlarmRepository repository;
 
+    // 1) Listener интерфейс
+    public interface OnAlarmLongClickListener {
+        void onAlarmLongClick(Alarm alarm, int position);
+    }
+
+    // 2) Listener поле
+    private OnAlarmLongClickListener longClickListener;
+
+    // 3) Setter
+    public void setOnAlarmLongClickListener(OnAlarmLongClickListener listener) {
+        this.longClickListener = listener;
+    }
     public AlarmAdapter(List<Alarm> alarmList, AlarmRepository repository) {
         this.alarmList = alarmList;
         this.repository = repository;
@@ -57,9 +69,10 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
         return alarmList.size();
     }
 
-    public static class AlarmViewHolder extends RecyclerView.ViewHolder {
+    public class AlarmViewHolder extends RecyclerView.ViewHolder {
         TextView timeText;
         TextView labelText;
+
         Switch alarmSwitch;
 
         public AlarmViewHolder(@NonNull View itemView) {
@@ -67,6 +80,16 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
             timeText = itemView.findViewById(R.id.alarmTimeText);
             labelText = itemView.findViewById(R.id.alarmLabel);
             alarmSwitch = itemView.findViewById(R.id.alarmSwitch);
+
+            itemView.setOnLongClickListener(v -> {
+                if (longClickListener != null && getAdapterPosition() != RecyclerView.NO_POSITION) {
+                    longClickListener.onAlarmLongClick(
+                            alarmList.get(getAdapterPosition()),
+                            getAdapterPosition()
+                    );
+                }
+                return true;
+            });
         }
     }
 }
