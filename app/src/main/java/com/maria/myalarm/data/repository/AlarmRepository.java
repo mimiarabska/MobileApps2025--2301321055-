@@ -40,4 +40,8 @@ public class AlarmRepository {
     public List<Alarm> getAllAlarms() {
         return alarmDao.getAllAlarms();
     }
+
+    public Alarm getAlarmById(int alarmId) {
+        return alarmDao.getAlarmById(alarmId);
+    }
 }

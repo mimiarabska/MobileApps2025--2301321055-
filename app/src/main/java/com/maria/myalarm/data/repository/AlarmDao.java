@@ -32,4 +32,8 @@ public interface AlarmDao {
     // Взимане на всички аларми
     @Query("SELECT * FROM alarms ORDER BY time ASC")
     List<Alarm> getAllAlarms();
+
+    @Query("SELECT * FROM alarms WHERE id = :alarmId LIMIT 1")
+    Alarm getAlarmById(int alarmId);
+
 }

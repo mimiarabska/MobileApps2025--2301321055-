@@ -68,6 +68,8 @@ dependencies {
     // Room (Java: use annotationProcessor)
     implementation libs.androidx.room.runtime
     implementation libs.androidx.compose.runtime
+    implementation libs.androidx.activity
+    implementation libs.androidx.constraintlayout
     annotationProcessor libs.androidx.room.compiler
     implementation libs.androidx.room.ktx
 
