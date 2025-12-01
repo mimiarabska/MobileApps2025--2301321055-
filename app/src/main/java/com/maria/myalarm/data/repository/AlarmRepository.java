@@ -18,7 +18,8 @@ public class AlarmRepository {
 
     // Добавяне на аларма
     public void insert(Alarm alarm) {
-        alarmDao.insert(alarm);
+        long id = alarmDao.insert(alarm);  // ВРЪЩА ID от Room
+        alarm.setId((int) id);            // ЗАДЪЛЖИТЕЛНО
     }
 
     // Обновяване на аларма

@@ -15,7 +15,7 @@ public interface AlarmDao {
 
     // Вмъкване на нова аларма
     @Insert
-    void insert(Alarm alarm);
+    long insert(Alarm alarm);
 
     // Обновяване на съществуваща аларма
     @Update

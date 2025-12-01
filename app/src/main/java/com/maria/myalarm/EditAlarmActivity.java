@@ -1,15 +1,25 @@
 package com.maria.myalarm;
 
+import android.annotation.SuppressLint;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.maria.myalarm.data.model.Alarm;
 import com.maria.myalarm.data.repository.AlarmRepository;
+
+import java.util.Calendar;
 
 public class EditAlarmActivity extends AppCompatActivity {
 
@@ -62,12 +72,88 @@ public class EditAlarmActivity extends AppCompatActivity {
                 true
         ).show();
     }
-
     private void saveChanges() {
+
+        // Записваме промените в модела
         alarm.setTime(editAlarmTime.getText().toString());
         alarm.setLabel(editLabel.getText().toString());
 
+        // Проверка за разрешение Exact Alarm (Android 12+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+            if (!alarmManager.canScheduleExactAlarms()) {
+                Intent intent = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
+                startActivity(intent);
+
+                Toast.makeText(this,
+                        "Моля разрешете „Exact Alarms“ в настройките, за да работи алармата.",
+                        Toast.LENGTH_LONG).show();
+
+                return; // спира изпълнението докато не даде разрешение
+            }
+        }
+
+        // Запис в базата
         repository.update(alarm);
-        finish(); // връща се към MainActivity
+
+        // Планираме алармата отново
+        scheduleAlarm(alarm);
+
+        // Затваряме екрана и се връщаме назад
+        finish();
+    }
+
+    // Спиране на аларма при триене
+    private void cancelAlarm(Alarm alarm) {
+        Intent intent = new Intent(this, AlarmReceiver.class);
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                this,
+                alarm.getId(),
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
+
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        alarmManager.cancel(pendingIntent);
+    }
+
+    // Настройване на AlarmManager
+    @SuppressLint("ScheduleExactAlarm")
+    private void scheduleAlarm(Alarm alarm) {
+
+        String[] parts = alarm.getTime().split(":");
+        int hour = Integer.parseInt(parts[0]);
+        int minute = Integer.parseInt(parts[1]);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, hour);
+        calendar.set(Calendar.MINUTE, minute);
+        calendar.set(Calendar.SECOND, 0);
+
+        // Ако часът е минал → задаваме за следващия ден
+        if (calendar.getTimeInMillis() < System.currentTimeMillis()) {
+            calendar.add(Calendar.DAY_OF_MONTH, 1);
+        }
+
+        Intent intent = new Intent(this, AlarmReceiver.class);
+        intent.putExtra("time", alarm.getTime());
+        intent.putExtra("label", alarm.getLabel());
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                this,
+                alarm.getId(),   // ВАЖНО: уникално ID
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
+
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+
+        alarmManager.setExactAndAllowWhileIdle(
+                AlarmManager.RTC_WAKEUP,
+                calendar.getTimeInMillis(),
+                pendingIntent
+        );
     }
 }

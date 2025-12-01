@@ -37,6 +37,17 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
         this.repository = repository;
     }
 
+    public interface OnAlarmClickListener {
+        void onAlarmClick(Alarm alarm, int position);
+    }
+
+    private OnAlarmClickListener clickListener;
+
+    public void setOnAlarmClickListener(OnAlarmClickListener listener) {
+        this.clickListener = listener;
+    }
+
+
     @NonNull
     @Override
     public AlarmViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -77,10 +88,22 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
 
         public AlarmViewHolder(@NonNull View itemView) {
             super(itemView);
+
             timeText = itemView.findViewById(R.id.alarmTimeText);
             labelText = itemView.findViewById(R.id.alarmLabel);
             alarmSwitch = itemView.findViewById(R.id.alarmSwitch);
 
+            // Нормален CLICK (за редакция)
+            itemView.setOnClickListener(v -> {
+                if (clickListener != null && getAdapterPosition() != RecyclerView.NO_POSITION) {
+                    clickListener.onAlarmClick(
+                            alarmList.get(getAdapterPosition()),
+                            getAdapterPosition()
+                    );
+                }
+            });
+
+            // ДЪЛЪГ CLICK (за триене)
             itemView.setOnLongClickListener(v -> {
                 if (longClickListener != null && getAdapterPosition() != RecyclerView.NO_POSITION) {
                     longClickListener.onAlarmLongClick(
@@ -91,5 +114,6 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
                 return true;
             });
         }
+
     }
 }
