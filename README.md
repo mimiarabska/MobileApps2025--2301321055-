@@ -52,7 +52,12 @@ git clone https://github.com/mimiarabska/MyAlarm.git
 
 Скрийншотове:
 * Списък с аларми: screenshots/alarm_list.jpg
+  ![alarm_list](https://github.com/user-attachments/assets/34f65345-1b21-46cf-91e9-28abe75342af)
 * Екран на аларма: screenshots/alarm_ring.jpg
+  ![alarm_ring](https://github.com/user-attachments/assets/b871ef7e-f7a9-435b-8e70-237bd3bd1701)
 * Edit Alarm: screenshots/alarm_edit.jpg
+![alarm_edit](https://github.com/user-attachments/assets/ec4aedf7-82e0-4494-a672-605f9d1e5a7a)
 *   screenshots/alarm_edit_time.jpg
+![alarm_edit_time](https://github.com/user-attachments/assets/cc8a9951-4a36-44eb-8751-9d0f7d2075f2)
+
 
