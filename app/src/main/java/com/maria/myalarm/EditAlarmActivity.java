@@ -27,6 +27,7 @@ public class EditAlarmActivity extends AppCompatActivity {
     private EditText editLabel;
     private Button changeTimeButton;
     private Button saveAlarmButton;
+    private Button shareAlarmButton;
 
     private AlarmRepository repository;
     private Alarm alarm;
@@ -46,6 +47,7 @@ public class EditAlarmActivity extends AppCompatActivity {
         editLabel = findViewById(R.id.editLabel);
         changeTimeButton = findViewById(R.id.changeTimeButton);
         saveAlarmButton = findViewById(R.id.saveAlarmButton);
+        shareAlarmButton = findViewById(R.id.shareAlarmButton);
 
         // Попълване с текущите данни
         editAlarmTime.setText(alarm.getTime());
@@ -57,6 +59,8 @@ public class EditAlarmActivity extends AppCompatActivity {
         // Запис
         saveAlarmButton.setOnClickListener(v -> saveChanges());
 
+        // Споделяне
+        shareAlarmButton.setOnClickListener(v -> shareAlarm());
     }
 
     private void openTimePicker() {
@@ -72,9 +76,8 @@ public class EditAlarmActivity extends AppCompatActivity {
                 true
         ).show();
     }
-    private void saveChanges() {
 
-        // Записваме промените в модела
+    private void saveChanges() {
         alarm.setTime(editAlarmTime.getText().toString());
         alarm.setLabel(editLabel.getText().toString());
 
@@ -90,39 +93,17 @@ public class EditAlarmActivity extends AppCompatActivity {
                         "Моля разрешете „Exact Alarms“ в настройките, за да работи алармата.",
                         Toast.LENGTH_LONG).show();
 
-                return; // спира изпълнението докато не даде разрешение
+                return;
             }
         }
 
-        // Запис в базата
         repository.update(alarm);
-
-        // Планираме алармата отново
         scheduleAlarm(alarm);
-
-        // Затваряме екрана и се връщаме назад
         finish();
     }
 
-    // Спиране на аларма при триене
-    private void cancelAlarm(Alarm alarm) {
-        Intent intent = new Intent(this, AlarmReceiver.class);
-
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(
-                this,
-                alarm.getId(),
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
-        );
-
-        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        alarmManager.cancel(pendingIntent);
-    }
-
-    // Настройване на AlarmManager
     @SuppressLint("ScheduleExactAlarm")
     private void scheduleAlarm(Alarm alarm) {
-
         String[] parts = alarm.getTime().split(":");
         int hour = Integer.parseInt(parts[0]);
         int minute = Integer.parseInt(parts[1]);
@@ -132,7 +113,6 @@ public class EditAlarmActivity extends AppCompatActivity {
         calendar.set(Calendar.MINUTE, minute);
         calendar.set(Calendar.SECOND, 0);
 
-        // Ако часът е минал → задаваме за следващия ден
         if (calendar.getTimeInMillis() < System.currentTimeMillis()) {
             calendar.add(Calendar.DAY_OF_MONTH, 1);
         }
@@ -140,20 +120,33 @@ public class EditAlarmActivity extends AppCompatActivity {
         Intent intent = new Intent(this, AlarmReceiver.class);
         intent.putExtra("time", alarm.getTime());
         intent.putExtra("label", alarm.getLabel());
+        intent.putExtra("alarm_id", alarm.getId());
 
         PendingIntent pendingIntent = PendingIntent.getBroadcast(
                 this,
-                alarm.getId(),   // ВАЖНО: уникално ID
+                alarm.getId(),
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
 
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-
         alarmManager.setExactAndAllowWhileIdle(
                 AlarmManager.RTC_WAKEUP,
                 calendar.getTimeInMillis(),
                 pendingIntent
         );
+    }
+
+    private void shareAlarm() {
+        String time = editAlarmTime.getText().toString();
+        String label = editLabel.getText().toString();
+
+        String shareText = "Аларма: " + time + "\nЕтикет: " + label;
+
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_TEXT, shareText);
+
+        startActivity(Intent.createChooser(shareIntent, "Сподели аларма чрез:"));
     }
 }

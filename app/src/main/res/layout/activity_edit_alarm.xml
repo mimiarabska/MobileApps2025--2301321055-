@@ -47,5 +47,14 @@
         android:id="@+id/saveAlarmButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Save" />
+        android:text="Save"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Share бутон -->
+    <Button
+        android:id="@+id/shareAlarmButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Сподели аларма"/>
+
 </LinearLayout>
