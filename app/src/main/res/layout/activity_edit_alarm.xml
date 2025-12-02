@@ -55,6 +55,6 @@
         android:id="@+id/shareAlarmButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Сподели аларма"/>
+        android:text="Share alarm"/>
 
 </LinearLayout>
