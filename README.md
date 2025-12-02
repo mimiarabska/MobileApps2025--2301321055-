@@ -51,7 +51,8 @@ git clone https://github.com/mimiarabska/MyAlarm.git
 Няма нужда от регистрация или акаунт. Приложението работи локално на устройството.
 
 Скрийншотове:
-Списък с аларми: screenshots/alarm_list.png
-Екран на аларма: screenshots/alarm_ring.png
-Edit Alarm: screenshots/edit_alarm.png
+* Списък с аларми: screenshots/alarm_list.jpg
+* Екран на аларма: screenshots/alarm_ring.jpg
+* Edit Alarm: screenshots/alarm_edit.jpg
+*   screenshots/alarm_edit_time.jpg
 
